@@ -3,6 +3,7 @@ import NextAuth from "next-auth";
 
 declare module "next-auth" {
   interface User {
+    id: string;
     coverImage?: string | null; // Add your custom property here
   }
 
@@ -15,3 +16,6 @@ declare module "next-auth" {
     };
   }
 }
+
+// next-auth.d.ts
+import NextAuth from "next-auth";
