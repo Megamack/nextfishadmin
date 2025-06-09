@@ -1,34 +1,34 @@
-import { withAuth, NextRequestWithAuth } from "next-auth/middleware";
+// src/middleware.ts
+import { auth } from "@/auth"; // <-- Replace with your actual auth.ts path
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default withAuth(
-  function middleware(req: NextRequestWithAuth) {
-    const pathname = req.nextUrl?.pathname;
-    const isAdmin = req.nextauth.token?.role === "ADMIN";
-    const isUser = req.nextauth.token?.role === "USER";
+export async function middleware(req: NextRequest) {
+  const session = await auth(req);
+  const pathname = req.nextUrl.pathname;
 
-    if (pathname.includes("/admin") && !isAdmin) {
-      return NextResponse.redirect(new URL("/user", req.url));
-    }
+  const role = session?.user?.role;
 
-    if (pathname.includes("/user") && !isUser) {
-      return NextResponse.redirect(new URL("/admin", req.url));
-    }
+  // Redirect unauthenticated users
+  if (!session) {
+    return NextResponse.redirect(new URL("/", req.url)); // or login route
+  }
 
-    // if logged in redirect to admin
-    return NextResponse.next();
-  },
-  {
-    secret: process.env.SECRET,
-    callbacks: {
-      authorized: (params) => {
-        const { token } = params;
-        return !!token;
-      },
-    },
-  },
-);
+  const isAdmin = role === "ADMIN";
+  const isUser = role === "USER";
+
+  // Restrict access based on role
+  if (pathname.startsWith("/admin") && !isAdmin) {
+    return NextResponse.redirect(new URL("/user", req.url));
+  }
+
+  if (pathname.startsWith("/user") && !isUser) {
+    return NextResponse.redirect(new URL("/admin", req.url));
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: ["/user/:path*", "/admin/:path*"],
+  matcher: ["/admin/:path*", "/user/:path*"],
 };
