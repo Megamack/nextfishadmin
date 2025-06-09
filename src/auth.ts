@@ -31,6 +31,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       authorize: async (credentials) => {
         // Dummy user example
         const user = {
+          id: "897234",
           name: "Markus",
           email: "markus@gofish.fi",
           coverImage: "url.png",
