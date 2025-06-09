@@ -1,6 +1,6 @@
 import { prisma } from "@/libs/prismaDb";
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth"; // ✅ updated import
+import { auth } from "@/auth"; // ✅ updated import
 import { revalidatePath } from "next/cache";
 
 export async function POST(request: Request) {
