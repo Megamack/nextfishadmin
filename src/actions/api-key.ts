@@ -30,7 +30,7 @@ export async function createApiKey(keyName: string) {
     data: {
       name: keyName,
       key: hashedKey,
-      userId: user.id,
+      userId: user.id!,
     },
   });
 
