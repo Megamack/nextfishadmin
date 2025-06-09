@@ -1,6 +1,6 @@
 import { prisma } from "@/libs/prismaDb";
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth"; // ✅ new auth import
+import { auth } from "@/auth"; // ✅ new auth import
 
 export async function DELETE(request: Request) {
   const body = await request.json();
