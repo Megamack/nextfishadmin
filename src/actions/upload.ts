@@ -38,7 +38,7 @@ export async function getSignedURL(type: string, size: number) {
     ContentType: type,
     ContentLength: size,
     Metadata: {
-      userId: user.id,
+      userId: user.id!,
     },
   });
 
