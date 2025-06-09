@@ -21,6 +21,7 @@ const handler = NextAuth({
 export { handler }; */
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -42,4 +43,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    async session({ session, user }) {
+      if (session.user) {
+        session.user.id = user.id; // Add id to session user
+        session.user.coverImage = user.coverImage; // Optionally add coverImage
+      }
+      return session;
+    },
+  },
 });
