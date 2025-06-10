@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(req: NextRequest) {
-  const session = await auth(req);
+  const session = await auth();
   const pathname = req.nextUrl.pathname;
 
   const role = session?.user?.role;
