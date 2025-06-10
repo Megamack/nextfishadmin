@@ -13,6 +13,7 @@ declare module "next-auth" {
       email?: string | null;
       image?: string | null;
       coverImage?: string | null; // Add here as well
+      role?: string | null; // 👈 Add this
     };
   }
 }
