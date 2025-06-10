@@ -1,9 +1,3 @@
-"use server";
-import { prisma } from "@/libs/prismaDb";
-import bcrypt from "bcrypt";
-import { revalidatePath } from "next/cache";
-import { isAuthorized } from "@/libs/isAuthorized";
-
 type AuthorizedUser = {
   id: string;
   name?: string | null;
@@ -15,44 +9,39 @@ type AuthorizedUser = {
 
 export async function getApiKeys() {
   const user = await isAuthorized();
+
+  if (!user) {
+    throw new Error("Unauthorized"); // or return [], or null, based on your app logic
+  }
+
   const res = await prisma.apiKey.findMany({
     where: {
-      userId: user.id,
+      userId: (user as AuthorizedUser).id,
     },
   });
+
   return res;
 }
 
 export async function createApiKey(keyName: string) {
-  const user = (await isAuthorized()) as AuthorizedUser;
+  const user = await isAuthorized();
 
   if (!user) {
     return null;
   }
 
-  const key = user.role ?? "USER";
+  const castUser = user as AuthorizedUser;
 
-  // Hash the key
+  const key = castUser.role ?? "USER";
   const hashedKey = await bcrypt.hash(key, 10);
 
   await prisma.apiKey.create({
     data: {
       name: keyName,
       key: hashedKey,
-      userId: user.id,
+      userId: castUser.id,
     },
   });
 
   revalidatePath("/admin/api");
-}
-
-export async function deleteApiKey(id: string) {
-  const res = await prisma.apiKey.delete({
-    where: {
-      id,
-    },
-  });
-
-  revalidatePath("/admin/api");
-  return res;
 }
