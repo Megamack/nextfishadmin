@@ -7,12 +7,12 @@ export async function middleware(req: NextRequest) {
   const session = await auth();
   const pathname = req.nextUrl.pathname;
 
-  const role = session.user.role;
-
   // Redirect unauthenticated users
   if (!session) {
     return NextResponse.redirect(new URL("/", req.url)); // or login route
   }
+
+  const role = session.user.role;
 
   const isAdmin = role === "ADMIN";
   const isUser = role === "USER";
