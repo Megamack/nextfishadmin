@@ -4,6 +4,15 @@ import bcrypt from "bcrypt";
 import { revalidatePath } from "next/cache";
 import { isAuthorized } from "@/libs/isAuthorized";
 
+type AuthorizedUser = {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+  coverImage?: string | null;
+  role?: string;
+};
+
 export async function getApiKeys() {
   const user = await isAuthorized();
   const res = await prisma.apiKey.findMany({
@@ -15,7 +24,7 @@ export async function getApiKeys() {
 }
 
 export async function createApiKey(keyName: string) {
-  const user = await isAuthorized();
+  const user = (await isAuthorized()) as AuthorizedUser;
 
   if (!user) {
     return null;
