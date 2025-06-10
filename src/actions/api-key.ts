@@ -17,7 +17,7 @@ export async function getApiKeys() {
   const user = await isAuthorized();
   const res = await prisma.apiKey.findMany({
     where: {
-      userId: user?.id as string,
+      userId: user.id,
     },
   });
   return res;
@@ -30,7 +30,7 @@ export async function createApiKey(keyName: string) {
     return null;
   }
 
-  const key = (user as any)?.role ?? "USER"; // Temporary patch
+  const key = user.role ?? "USER";
 
   // Hash the key
   const hashedKey = await bcrypt.hash(key, 10);
@@ -39,7 +39,7 @@ export async function createApiKey(keyName: string) {
     data: {
       name: keyName,
       key: hashedKey,
-      userId: user.id!,
+      userId: user.id,
     },
   });
 
