@@ -1,7 +1,17 @@
 "use server";
+
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { isAuthorized } from "@/libs/isAuthorized";
+
+type AuthorizedUser = {
+  id: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+  coverImage?: string | null;
+  role?: string;
+};
 
 const s3Client = new S3Client({
   region: "auto",
@@ -13,7 +23,7 @@ const s3Client = new S3Client({
 });
 
 const acceptedTypes = ["image/png", "image/jpeg", "image/jpg"];
-const maxSize = 2000000; // 2mb
+const maxSize = 2 * 1024 * 1024; // 2MB
 
 export async function getSignedURL(type: string, size: number) {
   const user = await isAuthorized();
@@ -30,7 +40,9 @@ export async function getSignedURL(type: string, size: number) {
     return { failure: "file too large" };
   }
 
-  const key = `profile-image--${user.id}`;
+  const castUser = user as AuthorizedUser;
+
+  const key = `profile-image--${castUser.id}`;
 
   const putObjectCommand = new PutObjectCommand({
     Bucket: process.env.R2_BUCKET_NAME!,
@@ -38,15 +50,13 @@ export async function getSignedURL(type: string, size: number) {
     ContentType: type,
     ContentLength: size,
     Metadata: {
-      userId: user.id!,
+      userId: castUser.id,
     },
   });
 
-  const url = await getSignedUrl(
-    s3Client,
-    putObjectCommand,
-    { expiresIn: 60 }, // 60 seconds
-  );
+  const url = await getSignedUrl(s3Client, putObjectCommand, {
+    expiresIn: 60, // URL expires in 60 seconds
+  });
 
   return { success: { url, key } };
 }
