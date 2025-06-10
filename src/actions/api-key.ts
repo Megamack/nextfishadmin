@@ -1,3 +1,9 @@
+"use server";
+import { prisma } from "@/libs/prismaDb";
+import bcrypt from "bcrypt";
+import { revalidatePath } from "next/cache";
+import { isAuthorized } from "@/libs/isAuthorized";
+
 type AuthorizedUser = {
   id: string;
   name?: string | null;
@@ -44,4 +50,15 @@ export async function createApiKey(keyName: string) {
   });
 
   revalidatePath("/admin/api");
+}
+
+export async function deleteApiKey(id: string) {
+  const res = await prisma.apiKey.delete({
+    where: {
+      id,
+    },
+  });
+
+  revalidatePath("/admin/api");
+  return res;
 }
