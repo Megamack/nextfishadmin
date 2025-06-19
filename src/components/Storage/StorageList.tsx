@@ -1,6 +1,6 @@
 "use client";
 
-import { DocumentIcon } from "@/app/(site)/pages/file-manager/_components/icons";
+import { DocumentIcon } from "@/app/[locale]/(site)/pages/file-manager/_components/icons";
 import { MediaIcon } from "@/assets/icons";
 import React, { useEffect, useState } from "react";
 

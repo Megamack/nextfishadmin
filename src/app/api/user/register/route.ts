@@ -3,54 +3,60 @@ import { prisma } from "@/libs/prismaDb";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-	const body = await request.json();
-	const { name, email, password } = body;
+  try {
+    const body = await request.json();
+    const { firstName, lastName, email, password, reEnterPassword } = body;
 
-	if (!name || !email || !password) {
-		return new NextResponse("Missing Fields", { status: 400 });
-	}
+    if (!firstName || !lastName || !email || !password || !reEnterPassword) {
+      return new NextResponse("All fields are required.", { status: 400 });
+    }
 
-	const formatedEmail = email.toLowerCase();
+    if (password !== reEnterPassword) {
+      return new NextResponse("Passwords do not match.", { status: 400 });
+    }
 
-	const exist = await prisma.user.findUnique({
-		where: {
-			email: formatedEmail,
-		},
-	});
+    if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(password)) {
+      return new NextResponse(
+        "Password must be at least 8 characters long and include both letters and numbers.",
+        { status: 400 },
+      );
+    }
 
-	if (exist) {
-		throw new Error("Email already exists");
-	}
+    const formattedEmail = email.toLowerCase();
 
-	const adminEmails = process.env.ADMIN_EMAILS?.split(",") || [];
+    const existingUser = await prisma.user.findUnique({
+      where: { email: formattedEmail },
+    });
 
-	// Function to check if an email is in the list of admin emails
-	function isAdminEmail(email: string) {
-		return adminEmails.includes(email);
-	}
+    if (existingUser) {
+      return new NextResponse("Email already exists.", { status: 409 });
+    }
 
-	const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-	const newUser = {
-		name,
-		email: formatedEmail,
-		password: hashedPassword,
-		role: "USER",
-	};
+    const adminEmails =
+      process.env.ADMIN_EMAILS?.split(",").map((e) => e.trim()) || [];
+    const role = adminEmails.includes(formattedEmail) ? "ADMIN" : "USER";
 
-	if (isAdminEmail(formatedEmail)) {
-		newUser.role = "ADMIN";
-	}
+    const newUser = await prisma.user.create({
+      data: {
+        firstName,
+        lastName,
+        email: formattedEmail,
+        password: hashedPassword,
+        role,
+      },
+    });
 
-	try {
-		const user = await prisma.user.create({
-			data: {
-				...newUser,
-			},
-		});
-
-		return NextResponse.json(user);
-	} catch (error) {
-		return new NextResponse("Something went wrong", { status: 500 });
-	}
+    return NextResponse.json({
+      id: newUser.id,
+      email: newUser.email,
+      role: newUser.role,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+    });
+  } catch (error) {
+    console.error("Register error:", error);
+    return new NextResponse("Something went wrong.", { status: 500 });
+  }
 }

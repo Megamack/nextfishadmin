@@ -1,4 +1,4 @@
-// src/middleware.ts
+/* // src/middleware.ts
 import { auth } from "@/auth"; // <-- Replace with your actual auth.ts path
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
@@ -31,4 +31,23 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: ["/admin/:path*", "/user/:path*"],
+}; */
+
+import { NextRequest } from "next/server";
+import createMiddleware from "next-intl/middleware";
+import { routing } from "./i18n/routing";
+import { auth } from "@/auth"; // <-- Replace with your actual auth.ts path
+
+const intlMiddleware = createMiddleware(routing);
+
+export async function middleware(req: NextRequest) {
+  console.log("[Middleware] Accessed route:", req.nextUrl.pathname);
+  return intlMiddleware(req);
+}
+
+export const config = {
+  matcher: [
+    // Exclude API routes, Next.js internals, and static files
+    "/((?!api/auth|api|_next|_vercel|.*\\..*).*)",
+  ],
 };

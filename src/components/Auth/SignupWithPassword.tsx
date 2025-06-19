@@ -1,3 +1,5 @@
+"use client";
+
 import { EmailIcon, PasswordIcon, UserIcon } from "@/assets/icons";
 import axios from "axios";
 import { signIn } from "next-auth/react";
@@ -5,128 +7,137 @@ import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import InputGroup from "../FormElements/InputGroup";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 
+// Translations hook
 const SignupWithPassword = () => {
-  const [data, setData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    reEnterPassword: "",
+  const t = useTranslations("auth");
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const SignupSchema = z
+    .object({
+      firstName: z.string().min(1, t("first_name_required")),
+      lastName: z.string().min(1, t("last_name_required")),
+      email: z.string().email(t("invalid_email")),
+      password: z
+        .string()
+        .min(8, t("password_min_length"))
+        .regex(/[a-zA-Z]/, t("password_letters"))
+        .regex(/[0-9]/, t("password_numbers")),
+      reEnterPassword: z.string(),
+    })
+    .refine((data) => data.password === data.reEnterPassword, {
+      message: t("passwords_do_not_match"),
+      path: ["reEnterPassword"],
+    });
+
+  type FormData = z.infer<typeof SignupSchema>;
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<FormData>({
+    resolver: zodResolver(SignupSchema),
+    mode: "onChange",
+    reValidateMode: "onChange",
   });
 
-  const [loading, setLoading] = useState(false);
-  const { name, email, password, reEnterPassword } = data;
-
-  const router = useRouter();
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setData({
-      ...data,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (!name.trim() || !email || !password || !reEnterPassword) {
-      return toast.error("Please fill in all fields!");
-    }
-
+  const onSubmit = async (data: FormData) => {
     setLoading(true);
 
     try {
-      const res = await axios.post("/api/user/register", {
-        name,
-        email,
-        password,
-        reEnterPassword,
-      });
+      const res = await axios.post("/api/user/register", data);
 
       if (res.status === 200) {
-        toast.success("User has been registered");
-        setData({
-          name: "",
-          email: "",
-          password: "",
-          reEnterPassword: "",
-        });
-        setLoading(false);
-        signIn("credentials", { ...data, redirect: false }).then((callback) => {
-          if (callback?.error) {
-            toast.error(callback.error);
-            setLoading(false);
-          }
+        toast.success(t("user_registered"));
+        reset();
 
-          if (callback?.ok && !callback?.error) {
-            setLoading(false);
-            router.push("/");
-          }
+        const result = await signIn("credentials", {
+          ...data,
+          redirect: false,
         });
+
+        if (result?.error) {
+          toast.error(result.error);
+        } else {
+          router.push("/");
+        }
       } else {
-        toast.error(res.data);
-        setLoading(false);
+        toast.error(res.data || t("registration_failed"));
       }
     } catch (error: any) {
-      toast.error(error.response.data);
+      toast.error(error?.response?.data || t("something_went_wrong"));
+    } finally {
       setLoading(false);
-      return;
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <InputGroup
         type="text"
-        label="Name"
+        label={t("first_name")}
         className="mb-4 [&_input]:py-[15px]"
-        placeholder="Enter your full name"
-        name="name"
-        handleChange={handleChange}
-        value={data.name}
+        placeholder={t("enter_first_name")}
+        register={register("firstName")}
+        error={errors.firstName?.message}
+        icon={<UserIcon />}
+      />
+
+      <InputGroup
+        type="text"
+        label={t("last_name")}
+        className="mb-4 [&_input]:py-[15px]"
+        placeholder={t("enter_last_name")}
+        register={register("lastName")}
+        error={errors.lastName?.message}
         icon={<UserIcon />}
       />
 
       <InputGroup
         type="email"
-        label="Email"
+        label={t("email")}
         className="mb-4 [&_input]:py-[15px]"
-        placeholder="Enter your email"
-        name="email"
-        handleChange={handleChange}
-        value={data.email}
+        placeholder={t("enter_email")}
+        register={register("email")}
+        error={errors.email?.message}
         icon={<EmailIcon />}
       />
 
       <InputGroup
         type="password"
-        label="Password"
+        label={t("password")}
         className="mb-4 [&_input]:py-[15px]"
-        placeholder="Enter your password"
-        name="password"
-        handleChange={handleChange}
-        value={data.password}
+        placeholder={t("enter_password")}
+        register={register("password")}
+        error={errors.password?.message}
         icon={<PasswordIcon />}
       />
 
       <InputGroup
         type="password"
-        label="Re-type Password"
+        label={t("retype_password")}
         className="mb-6 [&_input]:py-[15px]"
-        placeholder="Re-enter your password"
-        name="reEnterPassword"
-        handleChange={handleChange}
-        value={data.reEnterPassword}
+        placeholder={t("reenter_password")}
+        register={register("reEnterPassword")}
+        error={errors.reEnterPassword?.message}
         icon={<PasswordIcon />}
       />
 
       <button
         type="submit"
         className="mb-5 flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary p-4 font-medium text-white transition hover:bg-opacity-90"
+        disabled={loading}
       >
-        Create account
+        {t("create_account")}
         {loading && (
-          <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-white border-t-transparent dark:border-dark dark:border-t-transparent" />
+          <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-white border-t-transparent" />
         )}
       </button>
     </form>

@@ -18,9 +18,10 @@ export function UserInfo() {
 
   const { data: session } = useSession();
 
+  console.log(session);
   const USER = {
-    name: session?.user.name || "John Smith",
-    email: session?.user.email || "johnson@nextadmin.com",
+    firstName: session?.user.firstName || "",
+    email: session?.user.email,
     img: session?.user?.image || "/images/user/user-03.png",
   };
 
@@ -33,13 +34,13 @@ export function UserInfo() {
           <Image
             src="/images/user/user-03.png"
             className="size-12"
-            alt={"Avatar for John Smith"}
+            alt={`Avatar for ${USER.firstName}`}
             role="presentation"
             width={200}
             height={200}
           />
           <figcaption className="flex items-center gap-1 font-medium text-dark dark:text-dark-6 max-[1024px]:sr-only">
-            <span>John Smith</span>
+            <span>{USER.firstName}</span>
 
             <ChevronUpIcon
               aria-hidden
@@ -63,7 +64,7 @@ export function UserInfo() {
           <Image
             src={USER.img}
             className="size-12 rounded-full"
-            alt={`Avatar for ${USER.name}`}
+            alt={`Avatar for ${USER.firstName}`}
             role="presentation"
             width={200}
             height={200}
@@ -71,7 +72,7 @@ export function UserInfo() {
 
           <figcaption className="space-y-1 text-base font-medium">
             <div className="mb-2 leading-none text-dark dark:text-white">
-              {USER.name}
+              {USER.firstName}sss
             </div>
 
             <div className="line-clamp-1 break-all leading-none text-gray-6">

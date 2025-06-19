@@ -1,3 +1,5 @@
+"use client";
+
 import { ArrowLeftIcon } from "@/components/Inbox/icons";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
@@ -8,23 +10,19 @@ import { NAV_DATA } from "./data";
 import { ChevronUp } from "./icons";
 import { MenuItem } from "./menu-item";
 import { useSidebarContext } from "./sidebar-context";
+import { useTranslations } from "next-intl";
 
 export function Sidebar() {
   const pathname = usePathname();
   const { setIsOpen, isOpen, isMobile, toggleSidebar } = useSidebarContext();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const t = useTranslations("nav"); // Your translation namespace
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) => (prev.includes(title) ? [] : [title]));
-
-    // Uncomment the following line to enable multiple expanded items
-    // setExpandedItems((prev) =>
-    //   prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title],
-    // );
   };
 
   useEffect(() => {
-    // Keep collapsible open, when it's subpage is active
     NAV_DATA.some((section) => {
       return section.items.some((item) => {
         return item.items.some((subItem) => {
@@ -32,8 +30,6 @@ export function Sidebar() {
             if (!expandedItems.includes(item.title)) {
               toggleExpanded(item.title);
             }
-
-            // Break the loop
             return true;
           }
         });
@@ -41,9 +37,22 @@ export function Sidebar() {
     });
   }, [pathname]);
 
+  // Create translated nav data on the fly
+  const translatedNavData = NAV_DATA.map((section) => ({
+    ...section,
+    label: t(section.label.toLowerCase().replace(/\s+/g, "_")), // e.g. "AUTH" => "auth"
+    items: section.items.map((item) => ({
+      ...item,
+      title: t(item.title.toLowerCase().replace(/\s+/g, "_")),
+      items: item.items.map((subItem) => ({
+        ...subItem,
+        title: t(subItem.title.toLowerCase().replace(/\s+/g, "_")),
+      })),
+    })),
+  }));
+
   return (
     <>
-      {/* Mobile Overlay */}
       {isMobile && isOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/50 transition-opacity duration-300"
@@ -77,16 +86,15 @@ export function Sidebar() {
                 onClick={toggleSidebar}
                 className="absolute left-3/4 right-4.5 top-1/2 -translate-y-1/2 text-right"
               >
-                <span className="sr-only">Close Menu</span>
+                <span className="sr-only">{t("close_menu")}</span>
 
                 <ArrowLeftIcon className="ml-auto size-7" />
               </button>
             )}
           </div>
 
-          {/* Navigation */}
           <div className="custom-scrollbar mt-6 flex-1 overflow-y-auto pr-3 min-[850px]:mt-10">
-            {NAV_DATA.map((section) => (
+            {translatedNavData.map((section) => (
               <div key={section.label} className="mb-6">
                 <h2 className="mb-5 text-sm font-medium text-dark-4 dark:text-dark-6">
                   {section.label}

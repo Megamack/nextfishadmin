@@ -6,8 +6,10 @@ import axios from "axios";
 import Link from "next/link";
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 export default function ForgotPassword() {
+  const t = useTranslations("auth");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -19,13 +21,12 @@ export default function ForgotPassword() {
     e.preventDefault();
 
     if (!email) {
-      toast.error("Please enter your email address.");
-
+      toast.error(t("please_enter_email"));
       return;
     }
 
     if (!validateEmail(email)) {
-      toast.error("Please enter a valid email address.");
+      toast.error(t("please_enter_valid_email"));
       return;
     }
 
@@ -36,7 +37,7 @@ export default function ForgotPassword() {
       });
 
       if (res.status === 404) {
-        toast.error("User not found.");
+        toast.error(t("user_not_found"));
         setEmail("");
         setLoading(false);
         return;
@@ -54,13 +55,14 @@ export default function ForgotPassword() {
       toast.error(error.response.data);
     }
   };
+
   return (
     <>
       <form onSubmit={handleSubmit}>
         <InputGroup
           type="email"
-          label="Email"
-          placeholder="Enter your email"
+          label={t("email")}
+          placeholder={t("enter_email")}
           className="mb-6"
           name="email"
           value={email}
@@ -75,22 +77,22 @@ export default function ForgotPassword() {
           >
             {loading ? (
               <>
-                Sending
+                {t("sending")}
                 <span
                   className={`inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-white border-t-transparent dark:border-dark dark:border-t-transparent`}
                 ></span>
               </>
             ) : (
-              "Send Password Reset Link"
+              t("send_password_reset_link")
             )}
           </button>
         </div>
 
         <div className="text-center font-medium">
           <p>
-            Login to your account from{" "}
+            {t("login_to_account_from")}{" "}
             <Link href="/auth/signin" className="text-primary underline">
-              here
+              {t("here")}
             </Link>
           </p>
         </div>

@@ -1,0 +1,91 @@
+{
+  "homepage": {
+    "title": "Hei maailma!",
+    "about": "Siirry tietosivulle"
+  },
+  "auth": {
+    "dont_have_an_account": "Eikö sinulla ole tiliä?",
+    "or_sign_in_with_email": "Tai kirjaudu sisään sähköpostilla",
+    "sign_in": "Kirjaudu sisään",
+    "sign_up": "Rekisteröidy",
+    "sign_in_to_your_account": "Kirjaudu tilillesi",
+    "welcome_back": "Tervetuloa takaisin!",
+    "sign_in_instruction": "Kirjaudu sisään täyttämällä tarvittavat kentät alla",
+    "sign_in_with_google": "Kirjaudu Google-tilillä",
+    "first_name": "Etunimi",
+    "last_name": "Sukunimi",
+    "email": "Sähköposti",
+    "password": "Salasana",
+    "retype_password": "Syötä salasana uudelleen",
+    "enter_first_name": "Syötä etunimesi",
+    "enter_last_name": "Syötä sukunimesi",
+    "enter_email": "Syötä sähköpostiosoitteesi",
+    "enter_password": "Syötä salasanasi",
+    "reenter_password": "Syötä salasana uudelleen",
+    "create_account": "Luo tili",
+
+    "first_name_required": "Etunimi on pakollinen",
+    "last_name_required": "Sukunimi on pakollinen",
+    "invalid_email": "Virheellinen sähköpostiosoite",
+    "password_min_length": "Salasanan on oltava vähintään 8 merkkiä pitkä",
+    "password_letters": "Salasanassa on oltava kirjaimia",
+    "password_numbers": "Salasanassa on oltava numeroita",
+    "passwords_do_not_match": "Salasanat eivät täsmää",
+
+    "user_registered": "Käyttäjä on rekisteröity",
+    "registration_failed": "Rekisteröinti epäonnistui",
+    "something_went_wrong": "Jotain meni pieleen",
+    "signup_breadcrumb": "Rekisteröidy",
+    "get_started": "Aloita ilmaiseksi",
+    "signup_description": "Luo tilisi täyttämällä tarvittavat kentät alla.",
+    "reset_password_breadcrumb": "Salasanan palautus",
+    "reset_password": "Palauta salasana!",
+    "reset_password_description": "Syötä sähköpostiosoitteesi saadaksesi linkin salasanan palautukseen.",
+    "invalid_token": "Virheellinen tunniste",
+    "remember_me": "Muista minut",
+    "forgot_password": "Unohtuiko salasana",
+    "forgot_password_question": "Unohditko salasanasi?",
+    "reset_password_instruction": "Syötä sähköpostiosoitteesi saadaksesi linkin salasanan vaihtoon.",
+    "sign_in_form_title": "Kirjautumislomake",
+
+    "please_enter_email": "Anna sähköpostiosoitteesi.",
+    "please_enter_valid_email": "Anna kelvollinen sähköpostiosoite.",
+    "user_not_found": "Käyttäjää ei löytynyt.",
+    "sending": "Lähetetään",
+    "send_password_reset_link": "Lähetä salasanan palautuslinkki",
+    "login_to_account_from": "Kirjaudu sisään tilillesi tästä",
+    "here": "tästä",
+    "session_title": "Sessio testi"
+  },
+
+  "localeswitcher": {
+    "label": "Valitse kieli",
+    "locale": "{locale}"
+  },
+  "layout": {
+    "toggle_sidebar": "Näytä/piilota valikko",
+    "logo_alt": "Yrityksen logo",
+    "header_title": "Otsikko",
+    "header_description": "Otsikon kuvaus",
+    "sign_in": "Kirjaudu sisään"
+  },
+  "nav": {
+    "auth": "TUNNUSTAUTUMINEN",
+    "sign_in": "Kirjaudu sisään",
+    "sign_up": "Rekisteröidy",
+    "reset_password": "Nollaa salasana",
+
+    "main_menu": "PÄÄVALIKKO",
+    "user_session": "Käyttäjäistunto",
+    "protected_page": "Suojaussivu",
+    "profile": "Profiili",
+
+    "support": "TUKI",
+    "messages": "Viestit",
+    "inbox": "Saapuneet",
+
+    "close_menu": "Sulje valikko",
+    "dashboard": "Kojelauta",
+    "ariaLabel": "leivänmurupolku"
+  }
+}
